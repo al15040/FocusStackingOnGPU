@@ -1,0 +1,34 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CreateContrastMap
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float> ContrastMap;
+Texture2D<float4> SrcTex;
+
+int LocalWinSize;
+int TexWidth;
+int TexHeight;
+
+[numthreads(8,8,1)]
+void CreateContrastMap(uint3 id : SV_DispatchThreadID)
+{
+	int startX = max( (int)id.x - (int)(LocalWinSize * 0.5), 0 );
+	int startY = max( (int)id.y - (int)(LocalWinSize * 0.5), 0 );
+	int endX   = min( (int)id.x + (int)(LocalWinSize * 0.5), TexWidth );
+	int endY   = min( (int)id.y + (int)(LocalWinSize * 0.5), TexHeight);
+
+	float maxLuminance = 0.0;
+	float minLuminance = 1000000.0;
+
+	for (int y = startY; y < endY; ++y)
+	for (int x = startX; x < endX; ++x)
+	{
+		float luminance = 0.298912 * SrcTex[uint2(x, y)].x 
+										+ 0.586611 * SrcTex[uint2(x, y)].y
+										+ 0.114478 * SrcTex[uint2(x, y)].z;
+		if (maxLuminance < luminance) maxLuminance = luminance;
+		if (minLuminance > luminance) minLuminance = luminance;
+	}
+	ContrastMap[id.xy] = maxLuminance - minLuminance;
+}

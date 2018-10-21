@@ -24,7 +24,8 @@ public class InputFileBtn : MonoBehaviour
 		if (Dlg.ShowDialog() == DialogResult.OK)
 		{
       string[] filePaths = Directory.GetFiles(Dlg.SelectedPath);
-      
+			FocusStacking fs = new FocusStacking(filePaths);
+			fs.StartFocusStacking(filePaths);
     }
 
   }
