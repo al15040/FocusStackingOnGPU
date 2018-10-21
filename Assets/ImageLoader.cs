@@ -6,7 +6,7 @@ using System.IO;
 
 public static class ImageLoader
 {
-  public static Texture ReadTextureByFile(string filePath)
+  public static Texture2D ReadTextureByFile(string filePath)
   {
     byte[] binaryTex = ReadByteByFile(filePath);
 

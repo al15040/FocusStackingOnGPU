@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using System.IO;
 
-public class FocusStacking 
+public class FocusStacking : MonoBehaviour
 {
   //Image読み込み→Projection(省略可)→各画像でコントラストマップ計算(compute shader)→Maxコントラストカラーを探索
   private ComputeShader m_focusStackingShader;
@@ -12,13 +12,14 @@ public class FocusStacking
   private int m_convWindowSize;
   private string[] m_imgPaths;
 
+	/*
   public FocusStacking(string[] imgPaths, int convWindowSize = 9)
   {
     m_convWindowSize = convWindowSize;
     m_imgPaths = new string[imgPaths.Length];
     System.Array.Copy(imgPaths, m_imgPaths, imgPaths.Length);
 	}
-
+	*/
 
 	public void StartFocusStacking(string[] imgsFolderPath, int convWindowSize = 9)
   {
@@ -28,53 +29,59 @@ public class FocusStacking
     if (path.EndsWith(".jpeg") || path.EndsWith(".JPG") || path.EndsWith(".JPEG") || path.EndsWith(".png"))
       jpegImgPaths.Add(path);
 
-    List<Texture> photos = new List<Texture>();
-		Debug.Log("img loading time");
-		var sw = new System.Diagnostics.Stopwatch();
-		sw.Start();
-		foreach (string path in jpegImgPaths) photos.Add( ImageLoader.ReadTextureByFile(path) );
-		sw.Stop();
-		Debug.Log($"{sw.ElapsedMilliseconds}ミリ秒");
-
-		CreateFocusStackImg(photos);
-  }
+		StartCoroutine("CreateFocusStackImg", jpegImgPaths);
+	}
 
 
-  private void CreateFocusStackImg(List<Texture> photos)
+  private IEnumerator CreateFocusStackImg(List<string> imgFilePaths)
   {
-		var contrastMap   = new RenderTexture( photos[0].width
-																				 , photos[0].height
+		Texture2D tex = ImageLoader.ReadTextureByFile(imgFilePaths[0]); 
+		var contrastMap   = new RenderTexture( tex.width
+																				 , tex.height
 																				 , 0
 																				 , RenderTextureFormat.RFloat
 																				 );
 		contrastMap.enableRandomWrite = true;
-		contrastMap.Create(); 
+		contrastMap.Create();
 
-		var focusStackImg = new RenderTexture( photos[0].width
-																				 , photos[0].height
+
+		var focusStackImg = new RenderTexture( tex.width
+																				 , tex.height
 																				 , 0
 																				 , RenderTextureFormat.ARGBFloat
 																				 );
 		focusStackImg.enableRandomWrite = true;
 		focusStackImg.Create();
 
+		Object.Destroy(tex);
+		tex = null;
+
 		Debug.Log("focus stacking execute time");
 		var sw = new System.Diagnostics.Stopwatch();
 		sw.Start();
-		for (int i = 0; i < photos.Count; ++i)
+		for (int i = 0; i < imgFilePaths.Count; ++i)
 		{
 			m_focusStackingShader = ComputeShader.Instantiate(Resources.Load<ComputeShader>("FocusStacking"));
 
 			int kernelFuncID = m_focusStackingShader.FindKernel("FocusStacking_MaxContrast");
 			m_focusStackingShader.SetInt("LocalWinSize", m_convWindowSize);
-			m_focusStackingShader.SetInt("TexWidth", photos[0].width);
-			m_focusStackingShader.SetInt("TexHeight", photos[0].height);
+			m_focusStackingShader.SetInt("TexWidth", focusStackImg.width);
+			m_focusStackingShader.SetInt("TexHeight", focusStackImg.height);
 			m_focusStackingShader.SetTexture(kernelFuncID, "ContrastMap", contrastMap);
 			m_focusStackingShader.SetTexture(kernelFuncID, "FocusStackingImg", focusStackImg);
 
-			m_focusStackingShader.SetTexture(kernelFuncID, "SrcTex", photos[i]);
+			Texture2D srcTex = ImageLoader.ReadTextureByFile(imgFilePaths[i]);
+			m_focusStackingShader.SetTexture(kernelFuncID, "SrcTex", srcTex);
 
-			m_focusStackingShader.Dispatch(kernelFuncID, photos[i].width / 2, photos[i].height / 2, 1);
+			m_focusStackingShader.Dispatch(kernelFuncID, srcTex.width / 2, srcTex.height / 2, 1);
+
+			MonoBehaviour.Destroy(srcTex);
+			MonoBehaviour.Destroy(m_focusStackingShader);
+			srcTex = null;
+			m_focusStackingShader = null;
+			Resources.UnloadUnusedAssets();
+			System.GC.Collect();
+			yield return null;
 		}
 
 		sw.Stop();

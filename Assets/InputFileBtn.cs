@@ -6,10 +6,13 @@ using System.IO;
 
 public class InputFileBtn : MonoBehaviour
 {
+	FocusStacking m_fs;
+	[SerializeField]
+	GameObject empty;
 
 	void Start ()
 	{
-
+		m_fs = empty.GetComponent<FocusStacking>();
 	}
 
 	void Update ()
@@ -24,8 +27,7 @@ public class InputFileBtn : MonoBehaviour
 		if (Dlg.ShowDialog() == DialogResult.OK)
 		{
       string[] filePaths = Directory.GetFiles(Dlg.SelectedPath);
-			FocusStacking fs = new FocusStacking(filePaths);
-			fs.StartFocusStacking(filePaths);
+			m_fs.StartFocusStacking(filePaths);
     }
 
   }
