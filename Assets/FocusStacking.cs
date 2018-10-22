@@ -24,10 +24,13 @@ public class FocusStacking : MonoBehaviour
 	public void StartFocusStacking(string[] imgsFolderPath, int convWindowSize = 9)
   {
     List<string> jpegImgPaths = new List<string>();
-		//JPEGのみ
-		foreach (string path in imgsFolderPath)
-    if (path.EndsWith(".jpeg") || path.EndsWith(".JPG") || path.EndsWith(".JPEG") || path.EndsWith(".png"))
-      jpegImgPaths.Add(path);
+
+    foreach (string path in imgsFolderPath)
+      if (path.EndsWith(".jpeg") || path.EndsWith(".JPG") || path.EndsWith(".JPEG") || path.EndsWith(".png"))
+      {
+        Debug.Log(path);
+        jpegImgPaths.Add(path);
+      }
 
 		StartCoroutine("CreateFocusStackImg", jpegImgPaths);
 	}
@@ -35,7 +38,8 @@ public class FocusStacking : MonoBehaviour
 
   private IEnumerator CreateFocusStackImg(List<string> imgFilePaths)
   {
-		Texture2D tex = ImageLoader.ReadTextureByFile(imgFilePaths[0]); 
+		Texture2D tex = ImageLoader.ReadTextureByFile(imgFilePaths[0]);
+
 		var contrastMap   = new RenderTexture( tex.width
 																				 , tex.height
 																				 , 0
@@ -45,7 +49,7 @@ public class FocusStacking : MonoBehaviour
 		contrastMap.Create();
 
 
-		var focusStackImg = new RenderTexture( tex.width
+    var focusStackImg = new RenderTexture( tex.width
 																				 , tex.height
 																				 , 0
 																				 , RenderTextureFormat.ARGBFloat
@@ -73,27 +77,27 @@ public class FocusStacking : MonoBehaviour
 			Texture2D srcTex = ImageLoader.ReadTextureByFile(imgFilePaths[i]);
 			m_focusStackingShader.SetTexture(kernelFuncID, "SrcTex", srcTex);
 
-			m_focusStackingShader.Dispatch(kernelFuncID, srcTex.width / 2, srcTex.height / 2, 1);
+      m_focusStackingShader.Dispatch(kernelFuncID, srcTex.width / 2, srcTex.height / 2, 1);
 
 			MonoBehaviour.Destroy(srcTex);
 			MonoBehaviour.Destroy(m_focusStackingShader);
 			srcTex = null;
 			m_focusStackingShader = null;
 			Resources.UnloadUnusedAssets();
-			System.GC.Collect();
-			yield return null;
+      
+      yield return null;
 		}
 
 		sw.Stop();
 		Debug.Log($"{sw.ElapsedMilliseconds}ミリ秒");
-
-		SaveImgAsJPEG(focusStackImg, "C:\\Users\\光\\Desktop\\angle01\\test.JPG");
+    
+		SaveImgAsJPEG(focusStackImg, "C:\\Users\\H_Shionozaki\\Desktop\\angle0\\test.jpeg", TextureFormat.RGBAFloat);
 	}
 
-	private void SaveImgAsJPEG(Texture srcTex, string filePath)
+	private void SaveImgAsJPEG(RenderTexture srcTex, string filePath, TextureFormat format)
 	{
-		var tex = new Texture2D(srcTex.width, srcTex.height, TextureFormat.RGBAFloat, false);
-		RenderTexture.active = (RenderTexture)srcTex;
+		var tex = new Texture2D(srcTex.width, srcTex.height, format, false);
+		RenderTexture.active = srcTex;
 		tex.ReadPixels(new Rect(0, 0, srcTex.width, srcTex.height), 0, 0);
 		tex.Apply();
 
