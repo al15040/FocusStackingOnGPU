@@ -1,12 +1,13 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel FocusStacking_MaxContrast
+#pragma kernel ContrastMapInit
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<float> ContrastMap;
 RWTexture2D<float4> FocusStackingImg;
 
-Texture2D SrcTex;
+Texture2D<float4> SrcTex;
 
 int LocalWinSize;
 int TexWidth;
@@ -20,8 +21,8 @@ void FocusStacking_MaxContrast(uint3 id : SV_DispatchThreadID)
 	int endX   = min((int)id.x + (int)(LocalWinSize * 0.5), TexWidth);
 	int endY   = min((int)id.y + (int)(LocalWinSize * 0.5), TexHeight);
 
-	float maxLuminance = 0.0;
-	float minLuminance = 1000000.0;
+	float maxLuminance = -1.0;
+	float minLuminance = 1000.0;
 
 	for (int y = startY; y < endY; ++y)
 	for (int x = startX; x < endX; ++x)
@@ -35,9 +36,18 @@ void FocusStacking_MaxContrast(uint3 id : SV_DispatchThreadID)
 
 	float contrast = maxLuminance - minLuminance;
 
-	if (ContrastMap[id.xy] < contrast)
+	if (ContrastMap[id.xy] < abs(contrast))
 	{
 		ContrastMap[id.xy] = contrast;
 		FocusStackingImg[id.xy] = SrcTex[id.xy];
 	}
+}
+
+
+RWTexture2D<float> InitContrastMap;
+
+[numthreads(2, 2, 1)]
+void ContrastMapInit(uint3 id : SV_DispatchThreadID)
+{
+  InitContrastMap[id.xy] = -1.0;
 }

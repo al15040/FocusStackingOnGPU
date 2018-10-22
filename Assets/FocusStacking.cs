@@ -28,7 +28,6 @@ public class FocusStacking : MonoBehaviour
     foreach (string path in imgsFolderPath)
       if (path.EndsWith(".jpeg") || path.EndsWith(".JPG") || path.EndsWith(".JPEG") || path.EndsWith(".png"))
       {
-        Debug.Log(path);
         jpegImgPaths.Add(path);
       }
 
@@ -39,7 +38,6 @@ public class FocusStacking : MonoBehaviour
   private IEnumerator CreateFocusStackImg(List<string> imgFilePaths)
   {
 		Texture2D tex = ImageLoader.ReadTextureByFile(imgFilePaths[0]);
-
 		var contrastMap   = new RenderTexture( tex.width
 																				 , tex.height
 																				 , 0
@@ -57,24 +55,26 @@ public class FocusStacking : MonoBehaviour
 		focusStackImg.enableRandomWrite = true;
 		focusStackImg.Create();
 
+
 		Object.Destroy(tex);
 		tex = null;
 
 		Debug.Log("focus stacking execute time");
 		var sw = new System.Diagnostics.Stopwatch();
 		sw.Start();
-		for (int i = 0; i < imgFilePaths.Count; ++i)
-		{
-			m_focusStackingShader = ComputeShader.Instantiate(Resources.Load<ComputeShader>("FocusStacking"));
 
-			int kernelFuncID = m_focusStackingShader.FindKernel("FocusStacking_MaxContrast");
-			m_focusStackingShader.SetInt("LocalWinSize", m_convWindowSize);
-			m_focusStackingShader.SetInt("TexWidth", focusStackImg.width);
-			m_focusStackingShader.SetInt("TexHeight", focusStackImg.height);
-			m_focusStackingShader.SetTexture(kernelFuncID, "ContrastMap", contrastMap);
-			m_focusStackingShader.SetTexture(kernelFuncID, "FocusStackingImg", focusStackImg);
+    for (int i = 0; i < imgFilePaths.Count; ++i)
+    {
+      m_focusStackingShader = ComputeShader.Instantiate(Resources.Load<ComputeShader>("FocusStacking"));
 
-			Texture2D srcTex = ImageLoader.ReadTextureByFile(imgFilePaths[i]);
+      int kernelFuncID = m_focusStackingShader.FindKernel("FocusStacking_MaxContrast");
+      m_focusStackingShader.SetInt("LocalWinSize", m_convWindowSize);
+      m_focusStackingShader.SetInt("TexWidth", focusStackImg.width);
+      m_focusStackingShader.SetInt("TexHeight", focusStackImg.height);
+      m_focusStackingShader.SetTexture(kernelFuncID, "ContrastMap", contrastMap);
+      m_focusStackingShader.SetTexture(kernelFuncID, "FocusStackingImg", focusStackImg);
+
+      Texture2D srcTex = ImageLoader.ReadTextureByFile(imgFilePaths[i]);
 			m_focusStackingShader.SetTexture(kernelFuncID, "SrcTex", srcTex);
 
       m_focusStackingShader.Dispatch(kernelFuncID, srcTex.width / 2, srcTex.height / 2, 1);
@@ -84,13 +84,13 @@ public class FocusStacking : MonoBehaviour
 			srcTex = null;
 			m_focusStackingShader = null;
 			Resources.UnloadUnusedAssets();
-      
+
+      SaveImgAsJPEG(focusStackImg, "C:\\Users\\H_Shionozaki\\Desktop\\angle0\\test" + i.ToString() +".jpeg", TextureFormat.RGBAFloat);
       yield return null;
 		}
 
 		sw.Stop();
 		Debug.Log($"{sw.ElapsedMilliseconds}ミリ秒");
-    
 		SaveImgAsJPEG(focusStackImg, "C:\\Users\\H_Shionozaki\\Desktop\\angle0\\test.jpeg", TextureFormat.RGBAFloat);
 	}
 
@@ -101,7 +101,10 @@ public class FocusStacking : MonoBehaviour
 		tex.ReadPixels(new Rect(0, 0, srcTex.width, srcTex.height), 0, 0);
 		tex.Apply();
 
-		byte[] bytes = tex.EncodeToJPG();
+    Debug.Log(tex.name);
+    Debug.Log(tex.GetPixel(tex.width/2, tex.height/2).ToString());
+
+    byte[] bytes = tex.EncodeToJPG();
 		Object.Destroy(tex);
 
 		File.WriteAllBytes(filePath, bytes);

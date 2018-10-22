@@ -1,0 +1,10 @@
+Base path: C:/Program Files/Unity/Hub/Editor/2018.2.13f1/Editor/Data
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  api=4 insize=1501 outsize=1449 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  api=4 insize=1508 outsize=305 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler

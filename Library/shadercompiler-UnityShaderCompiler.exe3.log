@@ -1,31 +1,15 @@
 Base path: C:/Program Files/Unity/Hub/Editor/2018.2.13f1/Editor/Data
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  api=4 insize=824 outsize=1117 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: compileComputeKernel
-  api=4 insize=779 outsize=1109 ok=1
+  api=4 insize=1355 outsize=1449 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  error: 1 plat 4 at CreateContrastMap.compute(16): integer divides may be much slower, try using uints if possible.
-  error: 1 plat 4 at CreateContrastMap.compute(17): integer divides may be much slower, try using uints if possible.
-  error: 1 plat 4 at CreateContrastMap.compute(18): integer divides may be much slower, try using uints if possible.
-  error: 1 plat 4 at CreateContrastMap.compute(19): integer divides may be much slower, try using uints if possible.
-  api=4 insize=1126 outsize=1377 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=1138 outsize=1265 ok=1
+  api=4 insize=1505 outsize=1449 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
-Unhandled exception: Protocol error - unexpected end of data (did the Editor crash?)
-
-Quitting shader compiler process
