@@ -4,10 +4,11 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-RWTexture2D<float> ContrastMap;
+RWTexture2D<float> NewContrastMap;
 RWTexture2D<float4> FocusStackingImg;
 
 Texture2D<float4> SrcTex;
+Texture2D<float> ContrastMap;
 
 int LocalWinSize;
 int TexWidth;
@@ -36,11 +37,12 @@ void FocusStacking_MaxContrast(uint3 id : SV_DispatchThreadID)
 
 	float contrast = maxLuminance - minLuminance;
 
-	if (ContrastMap[id.xy] < abs(contrast))
+	if (ContrastMap[id.xy] < contrast)
 	{
-		ContrastMap[id.xy] = contrast;
+		NewContrastMap[id.xy]   = contrast;
 		FocusStackingImg[id.xy] = SrcTex[id.xy];
-	}
+	}else
+		NewContrastMap[id.xy]   = ContrastMap[id.xy];
 }
 
 

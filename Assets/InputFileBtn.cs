@@ -29,6 +29,5 @@ public class InputFileBtn : MonoBehaviour
       string[] filePaths = Directory.GetFiles(Dlg.SelectedPath);
 			m_fs.StartFocusStacking(filePaths);
     }
-
   }
 }

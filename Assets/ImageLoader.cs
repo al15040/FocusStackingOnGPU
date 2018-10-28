@@ -12,7 +12,6 @@ public static class ImageLoader
 
     Texture2D tex = new Texture2D(1, 1);
     tex.LoadImage(binaryTex);
-		
     return tex;
   }
 
