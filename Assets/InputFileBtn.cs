@@ -28,7 +28,7 @@ public class InputFileBtn : MonoBehaviour
 		{
       string[] filePaths = Directory.GetFiles(Dlg.SelectedPath);
       var FileDlg = new OpenFileDialog();
-      FileDlg.FileName = "FocusStackImage.JPG";
+      FileDlg.FileName = "FocusStackImage.png";
       FileDlg.InitialDirectory = Dlg.SelectedPath;
       FileDlg.Filter = "JPEGファイル(*.jpeg;*.JPG;*.JPEG)|*.jpeg;*.JPG;*.JPEG|pngファイル(*.png)|*.png";
       FileDlg.Title = "保存先を選択して下さい";
