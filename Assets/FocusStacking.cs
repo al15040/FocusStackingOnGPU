@@ -11,7 +11,7 @@ public class FocusStacking : MonoBehaviour
 	//あるピクセルについて、値が0の二値化画像がbackImgThreshold枚以上存在した場合
 	//そのピクセルは背景とする
 
-	public void StartFocusStacking(string[] imgsFolderPath, int convWindowSize = 9, int backImgThreshold = 5)
+	public void StartFocusStacking(string[] imgsFolderPath, string saveFilePath, int convWindowSize = 9, int backImgThreshold = 5)
   {
     List<string> jpegImgPaths = new List<string>();
 
@@ -19,11 +19,11 @@ public class FocusStacking : MonoBehaviour
     if (path.EndsWith(".jpeg") || path.EndsWith(".JPG") || path.EndsWith(".JPEG") || path.EndsWith(".png"))
 			jpegImgPaths.Add(path);
 	
-		StartCoroutine( CreateFocusStackImg(jpegImgPaths, convWindowSize) );
+		StartCoroutine( CreateFocusStackImg(jpegImgPaths, convWindowSize, saveFilePath) );
 	}
 
 
-  private IEnumerator CreateFocusStackImg(List<string> imgFilePaths, int convWindowSize)
+  private IEnumerator CreateFocusStackImg(List<string> imgFilePaths, int convWindowSize, string saveFilePath)
   {
 		if (imgFilePaths.Count == 0) yield break;
 
@@ -86,7 +86,7 @@ public class FocusStacking : MonoBehaviour
 		sw.Stop();
 		Debug.Log("focus stacking execute time");
 		Debug.Log($"{sw.ElapsedMilliseconds}ミリ秒");
-		SaveRendTexAsJPEG(focusStackImg, @"C:\Users\H_Shionozaki\Desktop\Insect Photos\Onikuwa\onikuwa_angle0\test.jpeg", TextureFormat.RGBAFloat);
+		SaveRendTexAsJPEG(focusStackImg, saveFilePath, TextureFormat.RGBAFloat);
 
 		focusStackImg.Release();
 		contrastMaps[0].Release();
