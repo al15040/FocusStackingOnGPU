@@ -86,7 +86,7 @@ public class FocusStacking : MonoBehaviour
 		sw.Stop();
 		Debug.Log("focus stacking execute time");
 		Debug.Log($"{sw.ElapsedMilliseconds}ミリ秒");
-		SaveRendTexAsJPEG(focusStackImg, @"C:\Users\光\Desktop\angle0\test.jpeg", TextureFormat.RGBAFloat);
+		SaveRendTexAsJPEG(focusStackImg, @"C:\Users\H_Shionozaki\Desktop\Insect Photos\Onikuwa\onikuwa_angle0\test.jpeg", TextureFormat.RGBAFloat);
 
 		focusStackImg.Release();
 		contrastMaps[0].Release();
