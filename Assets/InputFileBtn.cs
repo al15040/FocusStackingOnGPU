@@ -30,7 +30,7 @@ public class InputFileBtn : MonoBehaviour
       var FileDlg = new OpenFileDialog();
       FileDlg.FileName = "FocusStackImage.JPG";
       FileDlg.InitialDirectory = Dlg.SelectedPath;
-      FileDlg.Filter = "JPEGファイル(*.jpeg;*.JPG;*.JPEG)|*.jpeg;*.JPG;*.JPEG|すべてのファイル(*.*)|*.*";
+      FileDlg.Filter = "JPEGファイル(*.jpeg;*.JPG;*.JPEG)|*.jpeg;*.JPG;*.JPEG|pngファイル(*.png)|*.png";
       FileDlg.Title = "保存先を選択して下さい";
       FileDlg.CheckFileExists = false;
 
@@ -41,13 +41,16 @@ public class InputFileBtn : MonoBehaviour
   }
 
 
-  private string CreateExtensionJPGorPNG(string filePath, string extension = ".JPG")
+  private string CreateExtensionJPGorPNG(string filePath)
   {
     string path = new string( filePath.ToCharArray() );
-    if ( !path.EndsWith(extension) )
-      path += extension;
 
-    return path;
+    if ( path.EndsWith(".jpeg") 
+      || path.EndsWith(".JPG")  
+      || path.EndsWith(".JPEG") 
+      || path.EndsWith(".png")
+      )  return path;
+    else return path + ".png";
   }
 
 }
