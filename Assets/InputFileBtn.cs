@@ -24,6 +24,9 @@ public class InputFileBtn : MonoBehaviour
 	{
 		var Dlg = new FolderBrowserDialog();
 
+		Texture2D fi = CreateConvFilter.CreateGaussianFilter(1.3, 3);
+
+
 		if (Dlg.ShowDialog() == DialogResult.OK)
 		{
       string[] filePaths = Directory.GetFiles(Dlg.SelectedPath);
@@ -34,8 +37,10 @@ public class InputFileBtn : MonoBehaviour
       FileDlg.Title = "保存先を選択して下さい";
       FileDlg.CheckFileExists = false;
 
-      if (FileDlg.ShowDialog() == DialogResult.OK)
-        m_fs.StartFocusStacking( filePaths, CreateExtensionJPGorPNG(FileDlg.FileName) );
+			File.WriteAllBytes(FileDlg.FileName, fi.EncodeToPNG());
+
+			if (FileDlg.ShowDialog() == DialogResult.OK)
+				return;// m_fs.StartFocusStacking( filePaths, CreateExtensionJPGorPNG(FileDlg.FileName) );
 
      }
   }
