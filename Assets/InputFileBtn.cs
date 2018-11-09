@@ -22,25 +22,23 @@ public class InputFileBtn : MonoBehaviour
 
 	public void OnClick()
 	{
-		var Dlg = new FolderBrowserDialog();
+		var Dlg = new OpenFileDialog();
 
-		Texture2D fi = CreateConvFilter.CreateGaussianFilter(1.3, 3);
+   // Dlg.Filter = "画像ファイル(*.jpeg;*.JPG;*.JPEG;*.png;*.PNG)|*.jpeg;*.JPG;*.JPEG;*.png;*.PNG";
+    Dlg.Title = "画像を選択";
+    Dlg.Multiselect = true;
 
-
-		if (Dlg.ShowDialog() == DialogResult.OK)
+    if (Dlg.ShowDialog() == DialogResult.OK)
 		{
-      string[] filePaths = Directory.GetFiles(Dlg.SelectedPath);
-      var FileDlg = new OpenFileDialog();
-      FileDlg.FileName = "FocusStackImage.png";
-      FileDlg.InitialDirectory = Dlg.SelectedPath;
-      FileDlg.Filter = "JPEGファイル(*.jpeg;*.JPG;*.JPEG)|*.jpeg;*.JPG;*.JPEG|pngファイル(*.png)|*.png";
-      FileDlg.Title = "保存先を選択して下さい";
-      FileDlg.CheckFileExists = false;
+      string[] filePaths = Dlg.FileNames;
+      var SaveFileDlg = new OpenFileDialog();
+      SaveFileDlg.FileName = "FocusStackImage.png";
+      SaveFileDlg.Filter = "画像ファイル(*.jpeg;*.JPG;*.JPEG;*.png;*.PNG)|*.jpeg;*.JPG;*.JPEG;*.png;*.PNG";
+      SaveFileDlg.Title = "保存先を選択して下さい";
+      SaveFileDlg.CheckFileExists = false;
 
-			File.WriteAllBytes(FileDlg.FileName, fi.EncodeToPNG());
-
-			if (FileDlg.ShowDialog() == DialogResult.OK)
-				return;// m_fs.StartFocusStacking( filePaths, CreateExtensionJPGorPNG(FileDlg.FileName) );
+			if (SaveFileDlg.ShowDialog() == DialogResult.OK)
+				m_fs.StartFocusStacking( filePaths, CreateExtensionJPGorPNG(SaveFileDlg.FileName) );
 
      }
   }
@@ -54,7 +52,8 @@ public class InputFileBtn : MonoBehaviour
       || path.EndsWith(".JPG")  
       || path.EndsWith(".JPEG") 
       || path.EndsWith(".png")
-      )  return path;
+      || path.EndsWith(".PNG")
+      ) return path;
     else return path + ".png";
   }
 

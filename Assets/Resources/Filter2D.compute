@@ -1,0 +1,29 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Filter2D
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+Texture2D<float4> Source;
+Texture2D<float> Filter;
+
+int FilterSize;
+int SourceWidth;
+int SourceHeight;
+
+[numthreads(2,2,1)]
+void Filter2D(uint3 id : SV_DispatchThreadID)
+{
+  float3 value = float3(0,0,0);
+
+  for (int j = 0; j < FilterSize; ++j)
+  for (int i = 0; i < FilterSize; ++i)
+  {
+    int y = clamp((int)id.y + (j - FilterSize * 0.5), 0, SourceHeight - 1);
+    int x = clamp((int)id.x + (i - FilterSize * 0.5), 0, SourceWidth - 1 );
+
+    value += Filter[uint2(i, j)] * Source[uint2(x, y)].xyz;
+  }
+  Result[id.xy] = float4(value, 1.0f);
+}
